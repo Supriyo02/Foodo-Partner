@@ -3,7 +3,7 @@ import {View, Text, TextInput as RNTextInput} from 'react-native';
 import { Controller} from 'react-hook-form';
 import { MaterialIcons, Entypo } from '@expo/vector-icons';
 
-export default function FormTextInput({ control, name, label, placeholder, keyboardType = 'default', multiline = false, inputHeight = 48, icon, ...rest }: any) {
+export default function FormTextInput({ control, name, label, placeholder, keyboardType = 'default', multiline = false, inputHeight = 42, icon, ...rest }: any) {
     return (
         <Controller
             control={control}

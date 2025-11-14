@@ -16,7 +16,7 @@ export default function FormDropdown({ control, name, label, options = [] }: any
             activeOpacity={0.8}
             onPress={() => setOpen((s) => !s)}
             className={`flex-row items-center rounded-lg border ${error ? 'border-red-500' : 'border-border-primary'} px-3 justify-between`}
-            style={{ height: 48 }}
+            style={{ height: 42 }}
             accessibilityRole="button"
             accessibilityLabel={`${label || name} dropdown`}
           >

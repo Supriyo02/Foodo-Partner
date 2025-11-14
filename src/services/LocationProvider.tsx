@@ -1,36 +1,42 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, Keyboard, ActivityIndicator, Platform, Alert } from 'react-native';
-import MapView, { Marker, Region } from 'react-native-maps';
-import * as Location from 'expo-location';
+// LocationPickerWithMap.tsx
+import React, { useEffect, useRef, useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  FlatList,
+  Keyboard,
+  ActivityIndicator,
+  Alert,
+  Modal,
+  Platform,
+  TouchableWithoutFeedback,
+  findNodeHandle,
+  UIManager,
+  Dimensions,
+  NativeSyntheticEvent,
+  TextInput as RNTextInput,
+} from "react-native";
+import MapView, { Marker, Region, MapPressEvent } from "react-native-maps";
+import * as Location from "expo-location";
 
-/*
-  LocationPickerWithMap (Geoapify implementation)
-
-  - Uses Geoapify Autocomplete for suggestions and Geoapify Reverse Geocoding for reverse lookup
-  - Uses expo-location for current device location permission + fallback reverse geocode
-  - Uses react-native-maps for map + draggable marker
-  - Integrates with react-hook-form via Controller (store value as { address, latitude, longitude })
-
-  Install:
-    yarn add react-native-maps expo-location
-
-  Notes:
-    - Create a Geoapify API key: https://www.geoapify.com
-    - For production, avoid shipping unrestricted keys in the client. Prefer a tiny server proxy or strict referrer restrictions.
-    - For Expo Go: Map provider "PROVIDER_GOOGLE" may require a dev build. On Android/iOS you can still use the default provider (Apple/OSM) in Expo Go.
-
-  Usage (Controller):
-    <Controller
-      control={control}
-      name="location"
-      render={({ field }) => (
-        <LocationPickerWithMapGeoapify field={field} apiKey={GEOAPIFY_KEY} />
-      )}
-    />
-
-  Stored value example:
-    { address: string, latitude: number, longitude: number }
-*/
+/**
+ * Props:
+ *  - field: from react-hook-form Controller (render: ({ field }) => <... />)
+ *  - apiKey: Geoapify API key (string)
+ *  - searchPlaceholder?: string
+ *  - mapHeight?: number
+ *
+ * Usage:
+ * <Controller
+ *   control={control}
+ *   name="location"
+ *   render={({ field }) => <LocationPickerWithMap field={field} apiKey={GEOAPIFY} />}
+ * />
+ *
+ * Replace GEOAPIFY with your key.
+ */
 
 type Suggestion = {
   id: string;
@@ -39,28 +45,107 @@ type Suggestion = {
   lon: number;
 };
 
-export default function LocationPickerWithMap({ field, apiKey, searchPlaceholder = 'Search address or place', mapHeight = 220 }:
-  { field: any; apiKey: string; searchPlaceholder?: string; mapHeight?: number }) {
-  const [query, setQuery] = useState<string>(field.value?.address ?? '');
+export default function LocationPickerWithMap({
+  field,
+  apiKey,
+  searchPlaceholder = "Search address or place",
+  mapHeight = 220,
+  debug = false,
+}: {
+  field?: any;
+  apiKey: string;
+  searchPlaceholder?: string;
+  mapHeight?: number;
+  debug?: boolean; // set true to log measure/debug info
+}) {
+  // make field safe so component doesn't crash if used standalone
+  const safeField = field ?? { value: null, onChange: (_: any) => {} };
+
+  const [query, setQuery] = useState<string>(safeField.value?.address ?? "");
   const [loading, setLoading] = useState(false);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
-  const [region, setRegion] = useState<Region | null>(null);
   const [marker, setMarker] = useState<{ latitude: number; longitude: number } | null>(
-    field.value ? { latitude: field.value.latitude, longitude: field.value.longitude } : null
+    safeField.value
+      ? { latitude: safeField.value.latitude, longitude: safeField.value.longitude }
+      : null
   );
-  const debounceRef = useRef<number | null>(null);
+
+  // internal region state for bookkeeping only (NOT bound to MapView)
+  const [currentRegion, setCurrentRegion] = useState<Region | null>(() =>
+    safeField.value && safeField.value.latitude && safeField.value.longitude
+      ? {
+          latitude: safeField.value.latitude,
+          longitude: safeField.value.longitude,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
+        }
+      : null
+  );
+
+  // modal (dropdown) visibility & measured positioning
+  const [suggestionsVisible, setSuggestionsVisible] = useState(false);
+  const [suggestionsTop, setSuggestionsTop] = useState<number>(Platform.OS === "android" ? 90 : 110);
+  const [inputWidth, setInputWidth] = useState<number | undefined>(undefined);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const mapRef = useRef<MapView | null>(null);
+  const inputRef = useRef<RNTextInput | null>(null);
+
+  const screenHeight = Dimensions.get("window").height;
+
+  // measure input position to anchor the modal
+  const measureInput = () => {
+    try {
+      const node = findNodeHandle(inputRef.current);
+      if (!node) return;
+      UIManager.measureInWindow(
+        node,
+        (x: number, y: number, w: number, h: number) => {
+          // compute top for dropdown: a little below input
+          const top = y + h + 6;
+          // ensure dropdown does not go below visible area considering keyboard
+          const maxVisibleHeight = screenHeight - keyboardHeight - 10;
+          let adjustedTop = top;
+          // if suggested dropdown would overflow below keyboard, push it up if possible
+          // Here we simply ensure dropdown top is not > maxVisibleHeight - smallMinimum
+          if (top > maxVisibleHeight - 100) {
+            // place dropdown higher (above input)
+            adjustedTop = Math.max(8, y - 200); // show above if possible
+          }
+          setSuggestionsTop(adjustedTop);
+          setInputWidth(w);
+          if (debug) console.log("measureInput", { x, y, w, h, top, adjustedTop, keyboardHeight });
+        }
+      );
+    } catch (err) {
+      if (debug) console.warn("measureInput error", err);
+    }
+  };
 
   useEffect(() => {
-    if (field.value && field.value.latitude && field.value.longitude) {
-      const r: Region = {
-        latitude: field.value.latitude ?? 22.5726,
-        longitude: field.value.longitude ?? 88.3639,
-        latitudeDelta: 0.01,
-        longitudeDelta: 0.01,
-      };
-      setRegion(r);
-      setMarker({ latitude: field.value.latitude, longitude: field.value.longitude });
-    }
+    // keyboard listeners to recalc modal position when keyboard shows/hides
+    const subShow = Keyboard.addListener("keyboardDidShow", (e) => {
+      setKeyboardHeight(e.endCoordinates?.height ?? 0);
+      // delay measurement a little to let layout settle
+      setTimeout(measureInput, 80);
+    });
+    const subHide = Keyboard.addListener("keyboardDidHide", () => {
+      setKeyboardHeight(0);
+      setTimeout(measureInput, 80);
+    });
+
+    return () => {
+      subShow.remove();
+      subHide.remove();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debug]);
+
+  useEffect(() => {
+    // initial measurement in case input is already laid out
+    setTimeout(measureInput, 150);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -69,74 +154,41 @@ export default function LocationPickerWithMap({ field, apiKey, searchPlaceholder
     };
   }, []);
 
-  const getCurrentLocation = async () => {
-    try {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Location permission denied', 'We need location permission to show the map.');
-        return;
-      }
-
-      const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
-      const r: Region = {
-        latitude: pos.coords.latitude,
-        longitude: pos.coords.longitude,
-        latitudeDelta: 0.01,
-        longitudeDelta: 0.01,
-      };
-      setRegion(r);
-      setMarker({ latitude: pos.coords.latitude, longitude: pos.coords.longitude });
-
-      // Reverse geocode using Geoapify or expo fallback
-      if (apiKey) {
-        try {
-          const url = `https://api.geoapify.com/v1/geocode/reverse?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&apiKey=${apiKey}`;
-          const res = await fetch(url);
-          const json = await res.json();
-          console.log("Reverse geocode", json);
-          if (json && json.features && json.features.length > 0) {
-            const place = json.features[0];
-            const pretty = place.properties.formatted;
-            setQuery(pretty);
-            field.onChange({ address: pretty, latitude: pos.coords.latitude, longitude: pos.coords.longitude });
-            return;
-          }
-        } catch (err) {
-          console.warn('geoapify reverse error', err);
-        }
-      }
-
-      // Fallback to expo reverse geocode
-      const geocode = await Location.reverseGeocodeAsync({ latitude: pos.coords.latitude, longitude: pos.coords.longitude });
-      if (geocode && geocode.length > 0) {
-        const p = geocode[0];
-        const pretty = [p.name, p.street, p.city, p.region, p.postalCode, p.country].filter(Boolean).join(', ');
-        setQuery(pretty);
-        field.onChange({ address: pretty, latitude: pos.coords.latitude, longitude: pos.coords.longitude });
-      }
-    } catch (err) {
-      console.warn('getCurrentLocation error', err);
-    }
-  };
-
+  // --- fetch suggestions (Geoapify)
   const fetchSuggestions = async (text: string) => {
     if (!apiKey) return;
     try {
       setLoading(true);
-      // Geoapify autocomplete endpoint
-      const url = `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(text)}&limit=5&lang=en&format=json&apiKey=${apiKey}`;
+      const url = `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(
+        text
+      )}&limit=6&lang=en&format=json&apiKey=${apiKey}`;
       const res = await fetch(url);
       const json = await res.json();
-      console.log("Geoapify autocomplete", json)
-      if (json && json.features) {
-        const preds = json.features.map((f: any) => ({ id: f.properties.place_id || f.properties.osm_id || f.properties.rank_id || f.properties.formatted, description: f.properties.formatted, lat: f.geometry.coordinates[1], lon: f.geometry.coordinates[0] }));
+      if (debug) console.log("autocomplete", json?.features?.length);
+      if (json && json.features && Array.isArray(json.features)) {
+        const preds: Suggestion[] = json.features.map((f: any, idx: number) => ({
+          id:
+            f.properties?.place_id ??
+            f.properties?.osm_id ??
+            f.properties?.rank_id ??
+            f.properties?.formatted ??
+            String(idx),
+          description: f.properties?.formatted ?? f.properties?.name ?? "Unknown",
+          lat: f.geometry?.coordinates?.[1] ?? 0,
+          lon: f.geometry?.coordinates?.[0] ?? 0,
+        }));
         setSuggestions(preds);
+        setSuggestionsVisible(preds.length > 0);
+        // ensure measurement updated (keyboard may have opened)
+        setTimeout(measureInput, 40);
       } else {
         setSuggestions([]);
+        setSuggestionsVisible(false);
       }
     } catch (err) {
-      console.warn('geoapify autocomplete error', err);
+      if (debug) console.warn("fetchSuggestions error", err);
       setSuggestions([]);
+      setSuggestionsVisible(false);
     } finally {
       setLoading(false);
     }
@@ -144,16 +196,24 @@ export default function LocationPickerWithMap({ field, apiKey, searchPlaceholder
 
   const onQueryChange = (text: string) => {
     setQuery(text);
+    // measure for accurate placement (keyboard may change position)
+    measureInput();
+
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
       if (text && text.length > 2) fetchSuggestions(text);
-      else setSuggestions([]);
-    }, 250) as unknown as number;
+      else {
+        setSuggestions([]);
+        setSuggestionsVisible(false);
+      }
+    }, 300);
   };
 
+  // when user selects suggestion
   const selectSuggestion = async (s: Suggestion) => {
     Keyboard.dismiss();
     setSuggestions([]);
+    setSuggestionsVisible(false);
     setQuery(s.description);
 
     const r: Region = {
@@ -162,117 +222,175 @@ export default function LocationPickerWithMap({ field, apiKey, searchPlaceholder
       latitudeDelta: 0.01,
       longitudeDelta: 0.01,
     };
-    setRegion(r);
+    try {
+      mapRef.current?.animateToRegion?.(r, 350);
+    } catch {}
     setMarker({ latitude: s.lat, longitude: s.lon });
-
-    // Set form field value
-    field.onChange({ address: s.description, latitude: s.lat, longitude: s.lon });
+    setCurrentRegion(r);
+    safeField.onChange({ address: s.description, latitude: s.lat, longitude: s.lon });
   };
 
+  // map press (tap)
+  const onMapPress = async (e: MapPressEvent) => {
+    const { latitude, longitude } = e.nativeEvent.coordinate;
+    const r: Region = {
+      latitude,
+      longitude,
+      latitudeDelta: currentRegion?.latitudeDelta ?? 0.01,
+      longitudeDelta: currentRegion?.longitudeDelta ?? 0.01,
+    };
+    try {
+      mapRef.current?.animateToRegion?.(r, 250);
+    } catch {}
+    setMarker({ latitude, longitude });
+    setCurrentRegion(r);
+    await reverseGeocodeAndSet(latitude, longitude);
+  };
+
+  // marker drag end
   const onMarkerDragEnd = async (e: any) => {
     const { latitude, longitude } = e.nativeEvent.coordinate;
+    const r: Region = {
+      latitude,
+      longitude,
+      latitudeDelta: currentRegion?.latitudeDelta ?? 0.01,
+      longitudeDelta: currentRegion?.longitudeDelta ?? 0.01,
+    };
     setMarker({ latitude, longitude });
-    setRegion((r) => (r ? { ...r, latitude, longitude } : r));
+    setCurrentRegion(r);
+    await reverseGeocodeAndSet(latitude, longitude);
+  };
 
-    // Reverse geocode using Geoapify
+  const reverseGeocodeAndSet = async (latitude: number, longitude: number) => {
+    // try Geoapify reverse
     if (apiKey) {
       try {
         const url = `https://api.geoapify.com/v1/geocode/reverse?lat=${latitude}&lon=${longitude}&apiKey=${apiKey}`;
         const res = await fetch(url);
         const json = await res.json();
-        console.log("Reverse geocode", json)
+        if (debug) console.log("reverse", json?.features?.length);
         if (json && json.features && json.features.length > 0) {
           const address = json.features[0].properties.formatted;
           setQuery(address);
-          field.onChange({ address, latitude, longitude });
+          safeField.onChange({ address, latitude, longitude });
           return;
         }
       } catch (err) {
-        console.warn('geoapify reverse error', err);
+        if (debug) console.warn("geoapify reverse error", err);
       }
     }
 
-    // Fallback to expo reverseGeocode
+    // fallback: expo reverse
     try {
       const reverse = await Location.reverseGeocodeAsync({ latitude, longitude });
       if (reverse && reverse.length > 0) {
         const place = reverse[0];
-        const pretty = [place.name, place.street, place.city, place.region, place.postalCode, place.country].filter(Boolean).join(', ');
+        const pretty = [place.name, place.street, place.city, place.region, place.postalCode, place.country]
+          .filter(Boolean)
+          .join(", ");
         setQuery(pretty);
-        field.onChange({ address: pretty, latitude, longitude });
+        safeField.onChange({ address: pretty, latitude, longitude });
       }
     } catch (err) {
-      console.warn('expo reverse error', err);
+      if (debug) console.warn("expo reverse error", err);
     }
   };
 
-  return (
-    <View className="mb-4">
-      <Text className="text-sm font-semibold mb-1">Kitchen Address</Text>
+  // get current location
+  const getCurrentLocation = async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert("Location permission denied", "We need location permission to show the map.");
+        return;
+      }
+      const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
+      const r: Region = {
+        latitude: pos.coords.latitude,
+        longitude: pos.coords.longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      };
+      try {
+        mapRef.current?.animateToRegion?.(r, 350);
+      } catch {}
+      setMarker({ latitude: pos.coords.latitude, longitude: pos.coords.longitude });
+      setCurrentRegion(r);
 
-      {/* container without overflow-hidden so overlay can show */}
-      <View className="rounded-lg border border-gray-200">
-        {/* Search + suggestions wrapper */}
-        <View style={{ position: 'relative' }}>
+      // reverse geocode
+      await reverseGeocodeAndSet(pos.coords.latitude, pos.coords.longitude);
+    } catch (err) {
+      if (debug) console.warn("getCurrentLocation error", err);
+    }
+  };
+
+  // initial region (not controlled)
+  const initialRegion: Region =
+    currentRegion ??
+    ({
+      latitude: 22.5726,
+      longitude: 88.3639,
+      latitudeDelta: 0.05,
+      longitudeDelta: 0.05,
+    } as Region);
+
+  return (
+    <TouchableWithoutFeedback
+      onPress={() => {
+        Keyboard.dismiss();
+        setSuggestionsVisible(false);
+      }}
+    >
+      <View className="mb-4">
+        <Text className="text-sm font-semibold mb-1">Kitchen Address</Text>
+
+        <View className="rounded-lg border border-gray-200 bg-white overflow-visible">
+          {/* SEARCH ROW */}
           <View className="px-3 py-2 bg-white">
             <TextInput
+              ref={inputRef}
               value={query}
               onChangeText={onQueryChange}
-              onFocus={() => {/* optionally open list */}}
+              onFocus={() => {
+                measureInput();
+                if (suggestions.length > 0) setSuggestionsVisible(true);
+              }}
               placeholder={searchPlaceholder}
               placeholderTextColor="#9ca3af"
               className="text-base"
               accessibilityLabel="Location search"
-            />
-          </View>
-
-          {/* Suggestions overlay */}
-          {suggestions.length > 0 && (
-            <View
-              style={{
-                position: 'absolute',
-                top: 52,
-                left: 8,
-                right: 8,
-                zIndex: 9999,
-                elevation: 9999,
-                backgroundColor: '#fff',
-                borderRadius: 8,
-                maxHeight: 260,
-                shadowColor: '#000',
-                shadowOpacity: 0.08,
-                shadowRadius: 6,
+              onLayout={() => {
+                // ensure measurement known after layout
+                setTimeout(measureInput, 50);
               }}
-            >
-              <FlatList
-                data={suggestions}
-                keyExtractor={(i, idx) => i.id ?? String(idx)}
-                keyboardShouldPersistTaps="handled"
-                renderItem={({ item }) => (
-                  <TouchableOpacity onPress={() => selectSuggestion(item)} style={{ padding: 12, borderBottomWidth: 1, borderBottomColor: '#f3f4f6' }}>
-                    <Text>{item.description}</Text>
-                  </TouchableOpacity>
-                )}
-              />
+              returnKeyType="search"
+            />
+            <View className="mt-2">
+              <TouchableOpacity onPress={getCurrentLocation} className="px-3 py-2 rounded bg-gray-100 self-start">
+                <Text className="text-sm">Use my current location</Text>
+              </TouchableOpacity>
             </View>
-          )}
-        </View>
 
-        {/* small loader */}
-        {loading && (
-          <View className="px-3 py-2">
-            <ActivityIndicator />
+            {loading && (
+              <View className="mt-2">
+                <ActivityIndicator />
+              </View>
+            )}
           </View>
-        )}
 
-        {/* Map area */}
-        <View style={{ height: mapHeight }}>
-          {region ? (
+          {/* MAP AREA (not controlled by region prop) */}
+          <View style={{ height: mapHeight }}>
             <MapView
+              ref={(r) => {
+                mapRef.current = r ?? null;
+              }}
               style={{ flex: 1 }}
-              initialRegion={region}
-              region={region}
-              onRegionChangeComplete={(r) => setRegion(r)}
+              initialRegion={initialRegion}
+              onPress={onMapPress}
+              onRegionChangeComplete={(r) => {
+                // only store, do NOT bind to MapView prop -> avoids sliding
+                setCurrentRegion(r);
+              }}
             >
               {marker && (
                 <Marker
@@ -282,18 +400,54 @@ export default function LocationPickerWithMap({ field, apiKey, searchPlaceholder
                 />
               )}
             </MapView>
-          ) : (
-            <View className="flex-1 items-center justify-center">
-              <TouchableOpacity onPress={getCurrentLocation} className="px-4 py-2 rounded bg-gray-100">
-                <Text>Use my current location</Text>
-              </TouchableOpacity>
-            </View>
-          )}
+          </View>
         </View>
+
+        <Text className="text-xs text-gray-500 mt-1">Tip: drag the pin or tap the map for precise location</Text>
+
+        {/* Suggestions Modal anchored under input */}
+        <Modal visible={suggestionsVisible && suggestions.length > 0} transparent animationType="fade" statusBarTranslucent>
+          <TouchableWithoutFeedback
+            onPress={() => {
+              setSuggestionsVisible(false);
+              Keyboard.dismiss();
+            }}
+          >
+            <View className="flex-1" style={{ backgroundColor: "rgba(0,0,0,0.12)" }}>
+              <View
+                style={{
+                  position: "absolute",
+                  top: suggestionsTop,
+                  left: 12,
+                  right: inputWidth ? undefined : 12,
+                  width: inputWidth ?? undefined,
+                }}
+              >
+                <View className="bg-white rounded-lg overflow-hidden shadow-lg max-h-72 border border-gray-100">
+                  <FlatList
+                    data={suggestions}
+                    keyExtractor={(i) => i.id}
+                    keyboardShouldPersistTaps="handled"
+                    renderItem={({ item }) => (
+                      <TouchableOpacity
+                        onPress={() => selectSuggestion(item)}
+                        className="px-4 py-3 border-b border-gray-100"
+                      >
+                        <Text className="text-sm">{item.description}</Text>
+                      </TouchableOpacity>
+                    )}
+                    ListEmptyComponent={
+                      <View className="p-4">
+                        <Text className="text-sm text-gray-500">No suggestions</Text>
+                      </View>
+                    }
+                  />
+                </View>
+              </View>
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
       </View>
-
-
-      <Text className="text-xs text-gray-500 mt-1">Tip: drag the pin for precise location</Text>
-    </View>
+    </TouchableWithoutFeedback>
   );
 }

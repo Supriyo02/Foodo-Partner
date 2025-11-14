@@ -13,10 +13,11 @@ import { router } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import CustomButton from '@/src/components/CustomButton';
 import CustomLocationPicker from '@/src/components/CustomLocationPicker';
+import LocationPickerWithMap from '@/src/components/CustomLocationPicker';
 
 export default function KitchenSetupScreen() {
   const methods = useForm({
-    resolver: yupResolver(schema),
+    // resolver: yupResolver(schema),
     defaultValues: {
       kitchenName: '',
       kitchenType: '',
@@ -25,6 +26,12 @@ export default function KitchenSetupScreen() {
       address: '',
       // panNumber: '',
       // idProof: '',
+      location: {
+        "address": '',
+        "latitude": 12.345678,
+        "longitude": 98.765432,
+        "raw": { /* Geoapify feature object (optional) */ }
+      }
     },
   });
 
@@ -58,14 +65,17 @@ export default function KitchenSetupScreen() {
               <FormTextInput control={control} name="contactNumber" label="Contact Number" placeholder="Enter your contact number" keyboardType="phone-pad" icon="phone" maxLength={10} />
               <FormTextInput control={control} name="businessEmail" label="Business Email" placeholder="you@example.com" keyboardType="email-address" icon="email" />
 
-              <Text className="text-lg text-text-secondary font-inter-bold mb-3 mt-4">Kitchen Location</Text>
+              {/* <Text className="text-lg text-text-secondary font-inter-bold mb-3 mt-4">Kitchen Location</Text>
               <FormTextInput control={control} name="address" label="Full Kitchen Address" placeholder="123 Foodie Lane, Flavor Town" multiline />
 
               <View className="h-40 my-4 rounded-lg overflow-hidden bg-gray-100 items-center justify-center">
                 <Text className="text-gray-400">[Map preview placeholder — integrate react-native-maps in real app]</Text>
-              </View>
+              </View> */}
 
-              <CustomLocationPicker control={control} />
+              {/* <CustomLocationPicker control={control} /> */}
+
+              {/* <LocationPickerWithMap control={control} apiKey='4560770ebd274d458a62b41073058658' /> */}
+              <LocationPickerWithMap control={control} name="location" apiKey='4560770ebd274d458a62b41073058658'  />
 
               {/* <TouchableOpacity onPress={handleSubmit(onSubmit)} className="bg-primary rounded-xl p-4 w-full flex flex-row justify-center">
                 <Text className='text-white font-inter-bold paragraph-semibold'>Save and Continue</Text>
