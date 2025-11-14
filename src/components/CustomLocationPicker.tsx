@@ -15,10 +15,10 @@ type LocationValue = {
 type Props = {
   control: Control<any>;
   name?: string;
-  apiKey?: string; // Geoapify key (optional if you rely on fallback)
+  apiKey?: string; 
   placeholder?: string;
   mapHeight?: number;
-  showDebug?: boolean; // show on-screen debug info
+  showDebug?: boolean;
 };
 
 function useDebounce<T>(value: T, delay = 400) {
@@ -38,21 +38,14 @@ export default function LocationPickerWithMap({
   mapHeight = 260,
   showDebug = false,
 }: Props) {
-  const { field } = useController({ name, control, rules: { required: true } });
-
-  // local states
-  // const [query, setQuery] = useState<string>(field.value?.address || '');
+  const { field, fieldState  } = useController({ name, control, rules: { required: true } });
 
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
-  // const [marker, setMarker] = useState<{latitude: number; longitude: number} | null>(
-  //   field.value ? {latitude: field.value.latitude, longitude: field.value.longitude} : null,
-  // );
   const mapRef = useRef<MapView | null>(null);
   const [reverseLoading, setReverseLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [lastFetchError, setLastFetchError] = useState<string | null>(null);
-  // default region + address for initial load
   const DEFAULT_KOLKATA_REGION: Region = {
     latitude: 22.5726,
     longitude: 88.3639,
@@ -61,8 +54,6 @@ export default function LocationPickerWithMap({
   };
   const DEFAULT_KOLKATA_ADDRESS = 'Kolkata, West Bengal, India';
 
-
-  // sync external changes into local state
   useEffect(() => {
     if (field.value && field.value.address) {
       setQuery(field.value.address);
@@ -75,13 +66,11 @@ export default function LocationPickerWithMap({
         };
         setRegion(r);
         setMarker({ latitude: r.latitude, longitude: r.longitude });
-        // animate map
         setTimeout(() => mapRef.current?.animateToRegion(r, 400), 300);
       }
     }
   }, [field.value]);
 
-  // initial device location (do not overwrite form-provided location)
   useEffect(() => {
     (async () => {
       try {
@@ -98,7 +87,6 @@ export default function LocationPickerWithMap({
             setRegion(r);
             setMarker({ latitude: r.latitude, longitude: r.longitude });
 
-            // optional: reverse geocode and update form with real address
             const f = await reverseGeocode(r.latitude, r.longitude);
             const addr = f?.properties?.formatted || `${r.latitude}, ${r.longitude}`;
             field.onChange({ address: addr, latitude: r.latitude, longitude: r.longitude, raw: f });
@@ -107,14 +95,10 @@ export default function LocationPickerWithMap({
         }
       } catch (e) {
         console.warn('initial location error', e);
-        // keep Kolkata defaults — no further action
       }
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-
-  // Helpers: make sure coordinates are valid numbers
   const validCoords = (lat: any, lon: any) => {
     const a = Number(lat);
     const b = Number(lon);
@@ -136,12 +120,10 @@ export default function LocationPickerWithMap({
       ? { latitude: DEFAULT_KOLKATA_REGION.latitude, longitude: DEFAULT_KOLKATA_REGION.longitude } : { latitude: Number(field.value.latitude), longitude: Number(field.value.longitude) },
   );
 
-  // query (input text) shows form address if present, otherwise Kolkata
   const [query, setQuery] = useState<string>(field.value?.address || DEFAULT_KOLKATA_ADDRESS);
   const debouncedQuery = useDebounce(query, 450);
 
   useEffect(() => {
-    // If form has no location value, set Kolkata as default in the form once
     if (!field.value || !validCoords(field.value.latitude, field.value.longitude)) {
       field.onChange({
         address: DEFAULT_KOLKATA_ADDRESS,
@@ -150,12 +132,9 @@ export default function LocationPickerWithMap({
         raw: null,
       });
     }
-    // run only once on mount
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
 
-  // Try Geoapify autocomplete, fallback to Nominatim if needed
   async function fetchAutocomplete(q: string) {
     setLastFetchError(null);
     if (!q || q.length < 2) {
@@ -176,11 +155,9 @@ export default function LocationPickerWithMap({
           return;
         }
       }
-      // fallback: Nominatim search
       const nomUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=8&addressdetails=1`;
       const nomRes = await fetch(nomUrl, { headers: { 'User-Agent': 'FoodoApp/1.0 (your@email)' } });
       const nomJson = await nomRes.json();
-      // normalize nominatim results into Geoapify-like shape
       const mapped = nomJson.map((r: any) => ({
         type: 'Feature',
         properties: {
@@ -203,10 +180,8 @@ export default function LocationPickerWithMap({
 
   useEffect(() => {
     fetchAutocomplete(debouncedQuery);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedQuery]);
 
-  // reverse geocode with Geoapify, fallback to Nominatim
   async function reverseGeocode(lat: number, lon: number) {
     setReverseLoading(true);
     try {
@@ -217,7 +192,6 @@ export default function LocationPickerWithMap({
         const f = json?.features?.[0];
         if (f) return f;
       }
-      // fallback nominatim
       const nomUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&addressdetails=1`;
       const nomRes = await fetch(nomUrl, { headers: { 'User-Agent': 'FoodoApp/1.0 (your@email)' } });
       const nomJson = await nomRes.json();
@@ -290,10 +264,9 @@ export default function LocationPickerWithMap({
             }}
             placeholderTextColor="#8A8A8E"
             placeholder={placeholder}
-            className="border border-gray-300 rounded-md px-3 py-2 text-base font-inter text-text-primary"
+            className="border border-gray-300 rounded-md px-3 pl-2 pr-8 text-base font-inter text-text-primary"
             onFocus={() => setShowSuggestions(true)}
             style={{ height: 42 }}
-            // do NOT immediately hide suggestions on blur — user may be tapping a suggestion
             onBlur={() => setTimeout(() => setShowSuggestions(false), 250)}
             returnKeyType="search"
           />
@@ -304,7 +277,6 @@ export default function LocationPickerWithMap({
             </View>
           )}
 
-          {/* suggestions dropdown */}
           {showSuggestions && suggestions.length > 0 && (
             <View
               style={styles.suggestionsContainer}
@@ -320,8 +292,8 @@ export default function LocationPickerWithMap({
                     onPress={() => onSelectSuggestion(item)}
                     className="px-3 py-2 border-b border-gray-100"
                   >
-                    <Text className="text-sm">{item.properties?.formatted}</Text>
-                    <Text className="text-xs text-gray-400">
+                    <Text className="text-sm font-inter">{item.properties?.formatted}</Text>
+                    <Text className="text-xs text-text-secondary font-inter">
                       {item.properties?.country || item.properties?.state || ""}
                     </Text>
                   </TouchableOpacity>
@@ -333,14 +305,14 @@ export default function LocationPickerWithMap({
           <View className="flex-row justify-end mt-2">
             <TouchableOpacity
               onPress={() => useCurrentLocation()}
-              className="px-3 py-2 rounded-md border border-gray-300">
+              className="px-2 py-1 rounded-md border border-gray-300">
               <Text className="text-sm">Use current location</Text>
             </TouchableOpacity>
           </View>
         </View>
+        {fieldState?.error && <Text className="text-sm text-red-600 mt-1">{fieldState?.error?.message}</Text>}
       </View>
 
-      {/* Map view */}
       <View style={{ height: mapHeight }} className="overflow-hidden rounded-md border border-gray-200">
         {region ? (
           <MapView
@@ -383,13 +355,13 @@ export default function LocationPickerWithMap({
           </MapView>
         ) : (
           <View className="flex-1 items-center justify-center">
-            <Text className="text-sm text-gray-500">Map loading or location permission not granted.</Text>
+            <Text className="text-sm text-text-secondary font-inter">Map loading or location permission not granted.</Text>
           </View>
         )}
       </View>
 
-      <View className="mt-2">
-        <Text className="text-xs text-gray-500">Tap map to place a pin, or drag the pin for precision.</Text>
+      <View className="mb-2">
+        <Text className="text-xs text-text-secondary font-inter">Tap exact location on map to place a pin for precision.</Text>
         {reverseLoading && <ActivityIndicator />}
       </View>
 

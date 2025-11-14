@@ -1,5 +1,5 @@
-import React from 'react';
-import {ScrollView, View, Text, TouchableOpacity, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { ScrollView, View, Text, TouchableOpacity, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { FormProvider, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Button } from 'react-native-paper';
@@ -14,32 +14,42 @@ import { MaterialIcons } from '@expo/vector-icons';
 import CustomButton from '@/src/components/CustomButton';
 import CustomLocationPicker from '@/src/components/CustomLocationPicker';
 import LocationPickerWithMap from '@/src/components/CustomLocationPicker';
+import { formSubmit } from '@/src/services/dbCalls';
 
 export default function KitchenSetupScreen() {
+  const [loading, setLoading] = useState(false);
   const methods = useForm({
-    // resolver: yupResolver(schema),
+    resolver: yupResolver(schema),
     defaultValues: {
       kitchenName: '',
       kitchenType: '',
       contactNumber: '',
       businessEmail: '',
-      address: '',
       // panNumber: '',
       // idProof: '',
       location: {
         "address": '',
-        "latitude": 12.345678,
-        "longitude": 98.765432,
-        "raw": { /* Geoapify feature object (optional) */ }
+        "latitude": 22.5726,
+        "longitude": 88.3639,
+        "raw": { }
       }
     },
   });
 
   const { handleSubmit, control, setValue, getValues } = methods;
 
-  const onSubmit = (data: any) => {
-    console.log('FORM SUBMIT', data);
-    Alert.alert('Saved', 'Form saved successfully — implement navigation to next step.');
+  const onSubmit = async(data: any) => {
+    setLoading(true);
+    try {
+      await formSubmit(data);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+      Alert.alert("Error", errorMessage)
+    }
+    finally{
+      setLoading(false);
+      Alert.alert('Saved', 'Form saved successfully — implement navigation to next step.');
+    }
   };
 
   return (
@@ -54,14 +64,14 @@ export default function KitchenSetupScreen() {
               Kitchen Details
             </Text>
           </View>
-          <ScrollView contentContainerStyle={{ paddingVertical: 15, paddingHorizontal: 20}} keyboardShouldPersistTaps="handled">
-            <StepHeader step={1} total={4} info='Kitchen Details'/>
+          <ScrollView contentContainerStyle={{ paddingVertical: 15, paddingHorizontal: 20 }} keyboardShouldPersistTaps="handled">
+            <StepHeader step={1} total={4} info='Kitchen Details' />
             <Text className="text-3xl font-inter-bold mb-6">Setup Your Kitchen Profile</Text>
 
             <View className="bg-bg-primary rounded-2xl p-4 border-border-primary border shadow-sm">
               <Text className="text-lg text-text-secondary font-inter-bold mb-3">Basic Information</Text>
               <FormTextInput control={control} name="kitchenName" label="Kitchen Name" placeholder="e.g., Grandma's Comfort Kitchen" icon="store" />
-              <FormDropdown control={control} name="kitchenType" label="What type of kitchen is this?" options={[ 'Home Kitchen', 'Cloud Kitchen', 'Restaurant' ]} />
+              <FormDropdown control={control} name="kitchenType" label="What type of kitchen is this?" options={['Home Kitchen', 'Cloud Kitchen', 'Restaurant']} />
               <FormTextInput control={control} name="contactNumber" label="Contact Number" placeholder="Enter your contact number" keyboardType="phone-pad" icon="phone" maxLength={10} />
               <FormTextInput control={control} name="businessEmail" label="Business Email" placeholder="you@example.com" keyboardType="email-address" icon="email" />
 
@@ -74,13 +84,12 @@ export default function KitchenSetupScreen() {
 
               {/* <CustomLocationPicker control={control} /> */}
 
-              {/* <LocationPickerWithMap control={control} apiKey='4560770ebd274d458a62b41073058658' /> */}
-              <LocationPickerWithMap control={control} name="location" apiKey='4560770ebd274d458a62b41073058658'  />
+              <LocationPickerWithMap control={control} name="location" apiKey='4560770ebd274d458a62b41073058658' />
 
               {/* <TouchableOpacity onPress={handleSubmit(onSubmit)} className="bg-primary rounded-xl p-4 w-full flex flex-row justify-center">
                 <Text className='text-white font-inter-bold paragraph-semibold'>Save and Continue</Text>
               </TouchableOpacity> */}
-              <CustomButton onPress={handleSubmit(onSubmit)} title='Continue' />
+              <CustomButton onPress={handleSubmit(onSubmit)} title='Continue' isLoading={loading} />
             </View>
 
             {/* <View className="mt-6 bg-white rounded-2xl p-4 shadow-sm">
