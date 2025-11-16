@@ -12,6 +12,7 @@ export default function RootLayout() {
     "Inter-SemiBold": require('../../assets/fonts/Inter-SemiBold.ttf'),
     "Inter-Italic": require('../../assets/fonts/Inter-Italic.ttf'),
     "Inter-ExtraBoldItalic": require('../../assets/fonts/Inter-ExtraBoldItalic.ttf'),
+    "Inter-ExtraBold": require('../../assets/fonts/Inter-ExtraBold.ttf'),
   });
 
   useEffect(() => {

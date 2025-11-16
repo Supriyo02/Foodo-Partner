@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ScrollView, View, Text, TouchableOpacity, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { FormProvider, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -7,17 +7,18 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { kitchenSchema1 as schema } from '@/src/lib/validations/kitchenSetup.schema';
 import FormTextInput from '@/src/components/CustomTextInput';
 import FormDropdown from '@/src/components/CustomDropdown';
-import ImagePickerField from '@/src/components/CustomImagePicker';
 import StepHeader from '@/src/components/StepHeader';
 import { router } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import CustomButton from '@/src/components/CustomButton';
-import CustomLocationPicker from '@/src/components/CustomLocationPicker';
 import LocationPickerWithMap from '@/src/components/CustomLocationPicker';
 import { formSubmit } from '@/src/services/dbCalls';
+import useRegistrationKitchen from '@/src/stores/kitchenSetupStore';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
-export default function KitchenSetupScreen() {
+export default function SetupBusiness() {
   const [loading, setLoading] = useState(false);
+  const {setSetupKitchen, setupKitchen} = useRegistrationKitchen();
   const methods = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
@@ -25,8 +26,6 @@ export default function KitchenSetupScreen() {
       kitchenType: '',
       contactNumber: '',
       businessEmail: '',
-      // panNumber: '',
-      // idProof: '',
       location: {
         "address": '',
         "latitude": 22.5726,
@@ -36,12 +35,26 @@ export default function KitchenSetupScreen() {
     },
   });
 
-  const { handleSubmit, control, setValue, getValues } = methods;
+
+  const { handleSubmit, control, setValue, getValues, reset } = methods;
+  useEffect(() => {
+    reset(setupKitchen);
+  }, []);
 
   const onSubmit = async(data: any) => {
     setLoading(true);
     try {
+      setSetupKitchen({
+        kitchenName: data.kitchenName,
+        kitchenType: data.kitchenType,
+        contactNumber: data.contactNumber,
+        businessEmail: data.businessEmail,
+        location: data.location,
+      });
+      const kitchenDetails = useRegistrationKitchen.getState().setupKitchen;
+      console.log("Kitchen details: ", kitchenDetails);
       await formSubmit(data);
+      router.push('/setup-business');
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
       Alert.alert("Error", errorMessage)
@@ -55,8 +68,12 @@ export default function KitchenSetupScreen() {
   return (
     <FormProvider {...methods}>
       <SafeAreaView className="flex-1 bg-bg-primary">
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} className="flex-1">
-          <View className="px-4 py-2 border-b border-gray-200 bg-white flex-row relative">
+        <KeyboardAwareScrollView
+                  contentContainerStyle={{ flexGrow: 1 }}
+                  enableOnAndroid={true}
+                  showsVerticalScrollIndicator={false}
+                >
+          <View className="px-4 py-2 border-b border-gray-200 bg-bg-primary flex-row relative">
             <TouchableOpacity onPress={() => router.back()}>
               <MaterialIcons name="arrow-back" size={24} color="black" />
             </TouchableOpacity>
@@ -111,7 +128,7 @@ export default function KitchenSetupScreen() {
 
             <View style={{ height: 24 }} />
           </ScrollView>
-        </KeyboardAvoidingView>
+        </KeyboardAwareScrollView>
       </SafeAreaView>
     </FormProvider>
   );

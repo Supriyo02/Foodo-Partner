@@ -61,7 +61,7 @@ export default function VerifyOtp() {
     setLoading(true);
     try {
       await verifyOtp(phone);
-      router.push('/kitchen-setup')
+      router.push('/setup-kitchen-details')
     } catch (error) {
       const errorMessage =
                     error instanceof Error ? error.message : "An unknown error occurred";

@@ -28,6 +28,7 @@ module.exports = {
         "inter-medium": ["Inter-Medium", "sans-serif"],
         "inter-italic": ["Inter-Italic", "sans-serif"],
         "inter-extrabolditalic": ["Inter-ExtraBoldItalic", "sans-serif"],
+        "inter-extrabold": ["Inter-ExtraBold", "sans-serif"],
       }
     },
   },

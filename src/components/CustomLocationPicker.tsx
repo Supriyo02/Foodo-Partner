@@ -361,7 +361,7 @@ export default function LocationPickerWithMap({
       </View>
 
       <View className="mb-2">
-        <Text className="text-xs text-text-secondary font-inter">Tap exact location on map to place a pin for precision.</Text>
+        <Text className="text-xs text-text-secondary font-inter">Tap exact location on map to place the pin for precision.</Text>
         {reverseLoading && <ActivityIndicator />}
       </View>
 

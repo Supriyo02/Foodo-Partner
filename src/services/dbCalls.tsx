@@ -15,6 +15,6 @@ export const verifyOtp = async(otp: string) => {
 
 export const formSubmit = async(data: any) => {
     await new Promise((resolve) => setTimeout(resolve, 2000));
-    console.log("Phone number: ", data);
+    // console.log("Phone number: ", data);
     return 200;
 }
