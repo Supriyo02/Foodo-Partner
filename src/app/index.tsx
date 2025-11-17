@@ -6,7 +6,7 @@ import { router } from "expo-router";
 
 export default function Index() {
   return (
-    <SafeAreaView className="flex-1 bg-white h-full relative">
+    <SafeAreaView className="flex-1 bg-bg-secondary h-full relative">
       <ImageCarousel slides={ImageSliderData} height={Dimensions.get('screen').height / 1.4} autoPlay autoPlayInterval={2000} />
       <View className=" absolute bottom-1 items-center w-full">
         <View className="w-full px-6 mb-10">

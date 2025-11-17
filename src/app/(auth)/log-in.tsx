@@ -4,7 +4,7 @@ import {Image} from 'expo-image';
 import { Button, Provider as PaperProvider } from "react-native-paper";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from "react-native-reanimated";
-import { useRouter } from "expo-router";
+import { Redirect, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import cn from 'clsx'
 import useDbCall from "@/src/services/useDbCall";
@@ -14,6 +14,9 @@ import { sendOtp } from "@/src/services/dbCalls";
 const AnimatedView = Animated.createAnimatedComponent(View);
 
 export default function LogIn() {
+  const isAuthenticated = true;
+  if(isAuthenticated) return <Redirect href='/dashboard' />
+
   const router = useRouter();
   const [phone, setPhone] = useState("");
   const [focused, setFocused] = useState(false);
@@ -63,7 +66,7 @@ export default function LogIn() {
 
   return (
     <PaperProvider>
-      <SafeAreaView className="flex-1 bg-white">
+      <SafeAreaView className="flex-1 bg-bg-primary">
         <KeyboardAwareScrollView
           contentContainerStyle={{ flexGrow: 1 }}
           enableOnAndroid={true}
@@ -85,13 +88,13 @@ export default function LogIn() {
             </View>
 
             <View className="px-4 mt-6">
-            <View className="bg-white rounded-3xl p-4 shadow-sm border border-gray-100">
+            <View className="bg-bg-primary rounded-3xl p-4 shadow-sm border border-gray-100">
                 <Text className="text-gray-600 mb-3">Enter your Mobile Number</Text>
 
                 <View className="flex-row items-center">
                 <TouchableOpacity
                     activeOpacity={0.8}
-                    className="h-14 w-14 rounded-lg bg-gray-50 border border-gray-200 items-center justify-center mr-3"
+                    className="h-14 w-14 rounded-lg bg-bg-primary border border-gray-200 items-center justify-center mr-3"
                 >
                     <Image
                     source={require('@/assets/images/Flag_of_India.png')}

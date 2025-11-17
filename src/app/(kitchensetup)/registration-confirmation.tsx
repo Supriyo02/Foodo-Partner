@@ -118,7 +118,7 @@ export default function RegistraionConfirmation() {
         </View>
 
         <View className="w-full mt-16 px-6">
-          <CustomButton onPress={()=>router.replace('/')} title='Go to Your Dashboard' />
+          <CustomButton onPress={()=>router.replace('/dashboard')} title='Go to Your Dashboard' />
 
           {/* <Pressable className="bg-rose-600 rounded-full py-4 items-center">
             <Text className="text-white font-semibold text-base">Go to Your Dashboard</Text>

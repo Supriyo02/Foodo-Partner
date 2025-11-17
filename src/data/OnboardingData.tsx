@@ -15,12 +15,12 @@ export const ImageSliderData = [
     {
         id: '2',
         title: 'Manage orders easily, boost your kitchen efficiency',
-        uri: require('@/assets/images/onboarding/slide2.jpg'),
+        uri: require('@/assets/images/onboarding/slide3.jpg'),
     },
     {
         id: '3',
         title: 'Connect with customers and serve them faster',
-        uri: require('@/assets/images/onboarding/slide3.jpg'),
+        uri: require('@/assets/images/onboarding/slide2.jpg'),
     },
     {
         id: '4',
