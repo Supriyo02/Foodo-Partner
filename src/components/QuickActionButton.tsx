@@ -1,8 +1,8 @@
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
-import { DashboardData } from "../lib/types";
 import { Feather, FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 import * as Haptics from 'expo-haptics';
 import { Pressable, View, Text } from "react-native";
+import { DashboardData } from "@/types";
 
 export default function QuickActionButton({ item, onPress }: { item: DashboardData['quickActions'][number]; onPress: (id: string) => void }) {
   const scale = useSharedValue(1);

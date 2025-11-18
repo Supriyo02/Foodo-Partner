@@ -5,11 +5,11 @@ import * as Haptics from 'expo-haptics';
 import { MaterialIcons, Feather, FontAwesome5 } from '@expo/vector-icons';
 import cn from 'clsx';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { DashboardData } from '@/src/lib/types';
 import { dashboardData } from '@/src/data/dashboardData';
 import { StatCard } from '@/src/components/StatCard';
 import QuickActionButton from '@/src/components/QuickActionButton';
 import Tooltip from '@/src/components/ToolTip';
+import { DashboardData } from '@/types';
 
 export async function fetchDashboardData(): Promise<DashboardData> {
   await new Promise((res) => setTimeout(res, 700));

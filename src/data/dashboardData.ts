@@ -1,4 +1,4 @@
-import { DashboardData } from "../lib/types";
+import { DashboardData } from "@/types";
 
 export const dashboardData: DashboardData = {
     kitchenName: 'The Golden Spoon Kitchen',
