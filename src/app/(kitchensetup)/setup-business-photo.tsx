@@ -52,12 +52,7 @@ export default function SetupBusinessPhotoDetails() {
   return (
     <FormProvider {...methods}>
       <SafeAreaView className="flex-1 bg-bg-primary">
-        <KeyboardAwareScrollView
-          contentContainerStyle={{ flexGrow: 1 }}
-          enableOnAndroid={true}
-          showsVerticalScrollIndicator={false}
-        >
-          <View className="px-4 py-2 border-b border-gray-200 bg-bg-primary flex-row relative">
+        <View className="px-4 py-2 border-b border-gray-200 bg-bg-primary flex-row relative">
             <TouchableOpacity onPress={() => router.back()}>
               <MaterialIcons name="arrow-back" size={24} color="black" />
             </TouchableOpacity>
@@ -65,6 +60,12 @@ export default function SetupBusinessPhotoDetails() {
               Business Photo
             </Text>
           </View>
+          
+        <KeyboardAwareScrollView
+          contentContainerStyle={{ flexGrow: 1 }}
+          enableOnAndroid={true}
+          showsVerticalScrollIndicator={false}
+        >
           <ScrollView contentContainerStyle={{ paddingVertical: 15, paddingHorizontal: 20 }} keyboardShouldPersistTaps="handled">
             <StepHeader step={4} total={4} info='Business Photo' />
             <Text className="text-3xl font-inter-bold mb-6">Upload Business Photo</Text>

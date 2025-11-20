@@ -33,7 +33,7 @@ export default function SetupBankDetails() {
     reset(setupBank);
   }, []);
 
-  const onSubmit = async(data: any) => {
+  const onSubmit = async (data: any) => {
     setLoading(true);
     try {
       setSetupBank({
@@ -51,7 +51,7 @@ export default function SetupBankDetails() {
       const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
       Alert.alert("Error", errorMessage)
     }
-    finally{
+    finally {
       setLoading(false);
       Alert.alert('Saved', 'Form saved successfully - proceed to next step');
     }
@@ -60,19 +60,19 @@ export default function SetupBankDetails() {
   return (
     <FormProvider {...methods}>
       <SafeAreaView className="flex-1 bg-bg-primary">
+        <View className="px-4 py-2 border-b border-gray-200 bg-bg-primary flex-row relative">
+          <TouchableOpacity onPress={() => router.back()}>
+            <MaterialIcons name="arrow-back" size={24} color="black" />
+          </TouchableOpacity>
+          <Text className="absolute left-1/2 -translate-x-1/2 text-2xl font-inter-bold text-gray-900">
+            Bank Details
+          </Text>
+        </View>
         <KeyboardAwareScrollView
           contentContainerStyle={{ flexGrow: 1 }}
           enableOnAndroid={true}
           showsVerticalScrollIndicator={false}
         >
-          <View className="px-4 py-2 border-b border-gray-200 bg-bg-primary flex-row relative">
-            <TouchableOpacity onPress={() => router.back()}>
-              <MaterialIcons name="arrow-back" size={24} color="black" />
-            </TouchableOpacity>
-            <Text className="absolute left-1/2 -translate-x-1/2 text-2xl font-inter-bold text-gray-900">
-              Bank Details
-            </Text>
-          </View>
           <ScrollView contentContainerStyle={{ paddingVertical: 15, paddingHorizontal: 20 }} keyboardShouldPersistTaps="handled">
             <StepHeader step={3} total={4} info='Bank Details' />
             <Text className="text-3xl font-inter-bold mb-6">Provide Bank Details</Text>
@@ -82,11 +82,11 @@ export default function SetupBankDetails() {
               <Text className="text-2xl font-extrabold mb-2">Bank and UPI Details</Text>
               <Text className="text-gray-400 mb-4 font-inter">We will send your earnings to this account. Please enter details cautiously.</Text>
 
-              <FormTextInput control={control} name="bankName" label="Bank Name" placeholder="Enter your Bank Name" icon="cottage"/>
+              <FormTextInput control={control} name="bankName" label="Bank Name" placeholder="Enter your Bank Name" icon="cottage" />
               <FormTextInput control={control} name="accountNumber" label="Account Number" placeholder="Enter correct Bank Account Number" icon="attach-money" maxLength={14} />
-              <FormTextInput control={control} name="confirmAccountNumber" label="Confirm Account Number" placeholder="Re-enter Bank Account Number" icon="attach-money" maxLength={14} secureTextEntry={true}/>
-              <FormTextInput control={control} name="ifsc" label="IFSC Code" placeholder="Enter the branch IFSC Code" icon="confirmation-number"/>
-              <FormTextInput control={control} name="upiId" label="UPI Id" placeholder="Enter the UPI Id" icon="money"/>
+              <FormTextInput control={control} name="confirmAccountNumber" label="Confirm Account Number" placeholder="Re-enter Bank Account Number" icon="attach-money" maxLength={14} secureTextEntry={true} />
+              <FormTextInput control={control} name="ifsc" label="IFSC Code" placeholder="Enter the branch IFSC Code" icon="confirmation-number" />
+              <FormTextInput control={control} name="upiId" label="UPI Id" placeholder="Enter the UPI Id" icon="money" />
 
               {/* <View className='flex-1' /> */}
               <View className='flex-row gap-2 p-1'>

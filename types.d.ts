@@ -33,6 +33,7 @@ export type MenuItem  = {
   id: string;
   name: string;
   description ?: string;
+  items?: string[];
   price: number;
   status: 'available' | 'low_stock' | 'sold_out';
   image ?: string;
@@ -40,9 +41,10 @@ export type MenuItem  = {
 export type Combo  = {
   id: string;
   name: string;
-  items: string[];
+  description ?: string;
+  items?: string[];
   price: number;
-  status: 'available' | 'inactive';
+  status: 'available' | 'low_stock' | 'sold_out';
   image ?: string;
 };
 export type PreviousMenu  = {

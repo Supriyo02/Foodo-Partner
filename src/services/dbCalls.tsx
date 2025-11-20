@@ -68,7 +68,7 @@ export const menuService = {
         return [
             { id: 'i1', name: 'Classic Burger', description: 'Juicy grilled beef patty', price: 12.5, status: 'available', image: 'https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=800&q=80' },
             { id: 'i2', name: 'Spaghetti Bolognese', description: 'Slow-cooked meat sauce', price: 14.0, status: 'low_stock', image: 'https://images.unsplash.com/photo-1525755662778-989d0524087e?auto=format&fit=crop&w=800&q=80' },
-            { id: 'i3', name: 'Margherita Pizza', description: 'Classic cheese & basil', price: 11.0, status: 'available', image: 'https://images.unsplash.com/photo-1482049016688-2d3e1b311543?auto=format&fit=crop&w=800&q=80' },
+            { id: 'i3', name: 'Margherita Pizza', description: 'Classic cheese & basil', price: 11.0, status: 'sold_out', image: 'https://images.unsplash.com/photo-1482049016688-2d3e1b311543?auto=format&fit=crop&w=800&q=80' },
         ];
     },
     fetchCombos: async (): Promise<Combo[]> => {

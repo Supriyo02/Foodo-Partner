@@ -11,7 +11,7 @@ export default function FormTextInput({ control, name, label, placeholder, keybo
             render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
                 <View className="mb-4">
                     {label && <Text className="text-md font-inter-semibold mb-1">{label}</Text>}
-                    <View className={`flex-row items-center rounded-lg border ${error ? 'border-red-500' : 'border-border-primary'} px-3`} style={{ height: inputHeight }}>
+                    <View className={`flex-row rounded-xl border ${multiline ? 'items-start' : 'items-center'} ${error ? 'border-red-500' : 'border-border-primary'} px-3`} style={{ height: inputHeight }}>
                         {icon ? <View className="mr-2"><MaterialIcons name={icon} size={20} color={'#66666b'} /></View> : null}
                         <RNTextInput
                             value={value}

@@ -1,16 +1,37 @@
-import { View, Text } from "react-native";
-import { IconButton } from "react-native-paper";
+import React from "react";
+import { View, TextInput, TouchableOpacity } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
-const SearchBar: React.FC<{ value: string; onChange: (v: string) => void; placeholder?: string }> = ({ value, onChange, placeholder = 'Search' }) => {
-    return (
-        <View className="flex-row items-center bg-gray-100 rounded-xl px-3 py-2">
-            <IconButton icon="magnify" size={20} accessibilityLabel="search-icon" />
-            <View className="flex-1">
-                <Text className="text-base" accessibilityRole="search">{value || placeholder}</Text>
-            </View>
-            {value.length > 0 && <IconButton icon="close" size={20} onPress={() => onChange('')} accessibilityLabel="clear-search" />}
-        </View>
-    );
+type Props = {
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+};
+
+const SearchBar: React.FC<Props> = ({ value, onChange, placeholder = "Search..." }) => {
+  return (
+    <View className="flex-row items-center bg-surface border border-gray-300 rounded-3xl px-3 py-1">
+      <Ionicons name="search" size={18} color="#6B7280" />
+      <TextInput
+        value={value}
+        onChangeText={onChange}
+        placeholder={placeholder}
+        placeholderTextColor="#9CA3AF"
+        className="flex-1 ml-2 text-base text-gray-800 font-inter"
+        returnKeyType="search"
+        autoCorrect={false}
+      />
+      {value.length > 0 && (
+        <TouchableOpacity
+          onPress={() => onChange("")}
+          className="p-1"
+          accessibilityLabel="clear-search"
+        >
+          <Ionicons name="close-circle" size={18} color="#9CA3AF" />
+        </TouchableOpacity>
+      )}
+    </View>
+  );
 };
 
 export default SearchBar;

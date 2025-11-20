@@ -3,9 +3,9 @@ import { FAB, PaperProvider, Portal } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import SearchBar from "@/src/components/SearchBar";
 import { useCallback, useState } from "react";
-import CombosTab from "../menu/CombosTab";
-import PreviousMenusTab from "../menu/PrevMenuTab";
-import ItemsTab from "../menu/ItemsTab";
+import CombosTab from "../../components/menu/CombosTab";
+import PreviousMenusTab from "../../components/menu/PrevMenuTab";
+import ItemsTab from "../../components/menu/ItemsTab";
 import { MaterialIcons } from "@expo/vector-icons";
 import { images } from "@/src/lib/constants";
 
@@ -14,17 +14,10 @@ export default function MenuManagementScreen() {
   const [query, setQuery] = useState('');
 
 
-  const onAdd = useCallback(() => {
-    if (active === 'items') return Alert.alert('Add Item', 'Open Add Item flow');
-    if (active === 'combos') return Alert.alert('Add Combo', 'Open Add Combo flow');
-    return Alert.alert('Create Snapshot', 'Create previous menu snapshot');
-  }, [active]);
-
-
   return (
     <PaperProvider>
     <SafeAreaView className="flex-1 bg-bg-primary">
-        <View className="px-4 pb-2 pt-1 border-b gap-8 border-gray-200 bg-bg-primary flex-row relative">
+        <View className="px-4 pb-2 pt-8 gap-8 border-b border-gray-200 bg-bg-primary flex-row relative">
           <TouchableOpacity >
             <Image source={images.menu} className='size-6' resizeMode='contain' tintColor='black' />
           </TouchableOpacity>
@@ -33,44 +26,25 @@ export default function MenuManagementScreen() {
           </Text>
         </View>
 
-
-      {/* segmented control */}
-      <View className="flex-row justify-around mt-4 px-4">
-        <TouchableOpacity onPress={() => setActive('items')} className={`px-4 py-2 rounded-full ${active === 'items' ? 'bg-red-50' : ''}`}>
-          <Text className={`${active === 'items' ? 'text-red-600 font-semibold' : 'text-gray-600'}`}>Items</Text>
+      <View className="flex-row justify-around px-4 border-b border-gray-200">
+        <TouchableOpacity onPress={() => setActive('items')} className={`px-2 py-3 ${active === 'items' ? 'border-b-2 border-red-500' : ''}`}>
+          <Text className={`${active === 'items' ? 'text-primary font-inter-extrabold' : 'text-gray-600 font-inter-semibold'}`}>Items</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => setActive('combos')} className={`px-4 py-2 rounded-full ${active === 'combos' ? 'bg-red-50' : ''}`}>
-          <Text className={`${active === 'combos' ? 'text-red-600 font-semibold' : 'text-gray-600'}`}>Combos</Text>
+        <TouchableOpacity onPress={() => setActive('combos')} className={`px-2 py-3 ${active === 'combos' ? 'border-b-2 border-red-500' : ''}`}>
+          <Text className={`${active === 'combos' ? 'text-primary font-inter-extrabold' : 'text-gray-600 font-inter-semibold'}`}>Combos</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => setActive('previous')} className={`px-4 py-2 rounded-full ${active === 'previous' ? 'bg-red-50' : ''}`}>
-          <Text className={`${active === 'previous' ? 'text-red-600 font-semibold' : 'text-gray-600'}`}>Previous Menus</Text>
+        <TouchableOpacity onPress={() => setActive('previous')} className={`px-2 py-3 ${active === 'previous' ? 'border-b-2 border-red-500' : ''}`}>
+          <Text className={`${active === 'previous' ? 'text-primary font-inter-extrabold' : 'text-gray-600 font-inter-semibold'}`}>Previous Menus</Text>
         </TouchableOpacity>
       </View>
-
-
-      {/* Search */}
-      <View className="px-4 mt-4">
-        <SearchBar value={query} onChange={setQuery} placeholder={active === 'items' ? 'Search items...' : active === 'combos' ? 'Search combos...' : 'Search previous menus...'} />
-      </View>
-
 
       {/* content */}
       <View className="flex-1 px-4 mt-3">
-        {active === 'items' && <ItemsTab query={query} />}
-        {active === 'combos' && <CombosTab query={query} />}
+        {active === 'items' && <ItemsTab/>}
+        {active === 'combos' && <CombosTab/>}
         {active === 'previous' && <PreviousMenusTab />}
       </View>
 
-
-      {/* FAB - behavior and label change per tab. Use Portal at root for correct stacking (PaperProvider must be root). */}
-      <Portal>
-        <FAB
-          icon="plus"
-          label={active === 'items' ? 'Add Item' : active === 'combos' ? "Add Combo" : 'Snapshot'}
-          style={{ position: 'absolute', right: 20, bottom: 56 }}
-          onPress={onAdd}
-        />
-      </Portal>
     </SafeAreaView>
     </PaperProvider>
   );

@@ -34,7 +34,7 @@ export default function ImagePickerField({ control, name, label, height = 160 }:
           {label && <Text className="text-md font-inter-semibold mb-1">{label}</Text>}
           <TouchableOpacity
             onPress={() => pickImage(onChange)}
-            className={`rounded-lg border ${error ? 'border-red-500' : 'border-gray-200'} items-center justify-center`}
+            className={`rounded-lg border border-dashed ${error ? 'border-red-500' : 'border-gray-200'} items-center justify-center`}
             style={{ height }}
             accessibilityRole="button"
           >
@@ -42,9 +42,9 @@ export default function ImagePickerField({ control, name, label, height = 160 }:
               <Image source={typeof value === "string" ? { uri: value } : value} style={{ width: '100%', height: '100%', borderRadius: 12 }} resizeMode="cover" />
             ) : (
               <View className="items-center justify-center flex-1">
-                <Entypo name="upload" size={28} color='black' />
-                <Text className="mt-2 text-sm text-black font-inter">Click to upload</Text>
-                <Text className="text-xs text-gray-500 font-inter">PDF, JPG, PNG (Max 5MB)</Text>
+                <Entypo name="upload" size={28} color='#ea0b2c' />
+                <Text className="mt-2 text-sm text-primary font-inter">Click to upload</Text>
+                <Text className="text-xs text-gray-500 font-inter">JPG, PNG, SVG (Max 5MB)</Text>
               </View>
             )}
           </TouchableOpacity>

@@ -14,7 +14,7 @@ import { sendOtp } from "@/src/services/dbCalls";
 const AnimatedView = Animated.createAnimatedComponent(View);
 
 export default function LogIn() {
-  const isAuthenticated = true;
+  const isAuthenticated = false;
   if(isAuthenticated) return <Redirect href='/dashboard' />
 
   const router = useRouter();

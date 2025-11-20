@@ -31,10 +31,10 @@ export default function SetupBusiness() {
 
   const { handleSubmit, control, setValue, getValues, reset } = methods;
   useEffect(() => {
-      reset(setupBusiness);
-    }, []);
+    reset(setupBusiness);
+  }, []);
 
-  const onSubmit = async(data: any) => {
+  const onSubmit = async (data: any) => {
     setLoading(true);
     try {
       setSetupBusiness({
@@ -50,7 +50,7 @@ export default function SetupBusiness() {
       const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
       Alert.alert("Error", errorMessage)
     }
-    finally{
+    finally {
       setLoading(false);
       Alert.alert('Saved', 'Form saved successfully - proceed to next step');
     }
@@ -59,19 +59,20 @@ export default function SetupBusiness() {
   return (
     <FormProvider {...methods}>
       <SafeAreaView className="flex-1 bg-bg-primary">
+        <View className="px-4 py-2 border-b border-gray-200 bg-bg-primary flex-row relative">
+          <TouchableOpacity onPress={() => router.back()}>
+            <MaterialIcons name="arrow-back" size={24} color="black" />
+          </TouchableOpacity>
+          <Text className="absolute left-1/2 -translate-x-1/2 text-2xl font-inter-bold text-gray-900">
+            Verification Details
+          </Text>
+        </View>
         <KeyboardAwareScrollView
           contentContainerStyle={{ flexGrow: 1 }}
           enableOnAndroid={true}
           showsVerticalScrollIndicator={false}
         >
-          <View className="px-4 py-2 border-b border-gray-200 bg-bg-primary flex-row relative">
-            <TouchableOpacity onPress={() => router.back()}>
-              <MaterialIcons name="arrow-back" size={24} color="black" />
-            </TouchableOpacity>
-            <Text className="absolute left-1/2 -translate-x-1/2 text-2xl font-inter-bold text-gray-900">
-              Verification Details
-            </Text>
-          </View>
+
           <ScrollView contentContainerStyle={{ paddingVertical: 15, paddingHorizontal: 20 }} keyboardShouldPersistTaps="handled">
             <StepHeader step={2} total={4} info='Verification Details' />
             <Text className="text-3xl font-inter-bold mb-6">Provide Business & ID Details</Text>

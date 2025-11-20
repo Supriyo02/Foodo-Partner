@@ -3,7 +3,7 @@ import {View, Text, TouchableOpacity } from 'react-native';
 import { Controller} from 'react-hook-form';
 import { MaterialIcons } from '@expo/vector-icons';
 
-export default function FormDropdown({ control, name, label, options = [] }: any) {
+export default function FormDropdown({ control, name, label, placeholder='Select', icon, options = [] }: any) {
   const [open, setOpen] = useState(false);
   return (
     <Controller
@@ -21,8 +21,8 @@ export default function FormDropdown({ control, name, label, options = [] }: any
             accessibilityLabel={`${label || name} dropdown`}
           >
             <View className="flex-row items-center">
-              <MaterialIcons name="kitchen" size={18} className="mr-2" color={'#66666b'} />
-              <Text className={`${value ? 'text-text-primary font-inter' : 'text-text-secondary'}`}>{value || 'Select a kitchen type'}</Text>
+              {icon && <MaterialIcons name={icon} size={18} className="mr-2" color={'#66666b'} />}
+              <Text className={`${value ? 'text-text-primary font-inter' : 'text-text-secondary'}`}>{value || placeholder}</Text>
             </View>
             <MaterialIcons name="keyboard-arrow-down" size={24} color={'#66666b'} />
           </TouchableOpacity>
