@@ -52,3 +52,32 @@ export type PreviousMenu  = {
   title: string;
   createdAt: string;
 };
+
+
+export type AddCombo = {
+  id: string;
+  name: string;
+};
+
+export type AddItem = {
+  id: string;
+  name: string;
+};
+
+export type CategoryWithItems = {
+  id: string;
+  name: string;
+  items: Item[];
+};
+
+export type OrderCardType = {
+  id: string;
+  customer: string;
+  itemsSummary: string;
+  total: string;
+  meta?: string;
+  placedAt?: string;
+  deliveryLocation: string;
+  declined?: boolean;
+  rejected?: boolean;
+};

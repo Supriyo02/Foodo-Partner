@@ -2,7 +2,7 @@ import { View, Text, TouchableOpacity, ScrollView, Alert } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { addMenuSchema } from '@/src/lib/validations/addMenu.schema';
+import { addItemSchema } from '@/src/lib/validations/addMenu.schema';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -16,7 +16,7 @@ import CustomButton from '@/src/components/CustomButton';
 const AddItem = () => {
   const [loading, setLoading] = useState(false);
   const methods = useForm({
-    resolver: yupResolver(addMenuSchema),
+    resolver: yupResolver(addItemSchema),
     defaultValues: {
       itemPhoto: undefined,
       name: '',

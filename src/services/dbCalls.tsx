@@ -1,4 +1,4 @@
-import { Combo, MenuItem, PreviousMenu } from "@/types";
+import { AddCombo, AddItem, Combo, MenuItem, OrderCardType, PreviousMenu } from "@/types";
 
 
 
@@ -85,4 +85,88 @@ export const menuService = {
             { id: 'p2', title: 'Menu - April 2025', createdAt: '2025-04-01' },
         ];
     }
+};
+
+export async function fetchCombosName(): Promise<AddCombo[]> {
+  return new Promise((res) =>
+    setTimeout(
+      () =>
+        res([
+          { id: "c1", name: "Main Course" },
+          { id: "c2", name: "Dessert" },
+          { id: "c3", name: "Sides" },
+        ]),
+      150
+    )
+  );
+}
+
+export async function fetchItemsName(): Promise<AddItem[]> {
+  return new Promise((res) =>
+    setTimeout(
+      () =>
+        res([
+          { id: "i1", name: "Chicken Biryani" },
+          { id: "i2", name: "Mutton Korma" },
+          { id: "i3", name: "Gulab Jamun" },
+          { id: "i4", name: "Naan" },
+        ]),
+      150
+    )
+  );
+}
+
+export const fetchIncomingOrders = async (): Promise<OrderCardType[]> => {
+  await new Promise(res => setTimeout(res, 300));
+  return [
+    {
+      id: 'in_1',
+      customer: 'John D.',
+      itemsSummary: '2x Classic Burger, 1x Fries, 1x Coke',
+      total: '25.50',
+      meta: 'Prep Time: 15 min',
+      deliveryLocation: '22 Baker St, Apt 4B',
+    },
+    {
+      id: 'in_2',
+      customer: 'Jane S.',
+      itemsSummary: '1x Veggie Wrap, 1x Salad, +2 more',
+      total: '18.75',
+      meta: 'Delivery By: 6:45 PM',
+      deliveryLocation: '12 Green Ave',
+    },
+  ];
+};
+
+export const fetchPreparingOrders = async (): Promise<OrderCardType[]> => {
+  await new Promise(res => setTimeout(res, 250));
+  return [
+    {
+      id: 'pre_1',
+      customer: 'John D.',
+      itemsSummary: '2x Margherita Pizza, 1x Garlic Bread',
+      total: '25.50',
+      placedAt: 'Placed at 12:05 PM', //Placed at 
+      deliveryLocation: '22 Baker St, Apt 4B',
+    },
+  ];
+};
+
+export const fetchOutForDeliveryOrders = async (): Promise<OrderCardType[]> => {
+  await new Promise(res => setTimeout(res, 220));
+  return [
+    {
+      id: 'out_1',
+      customer: 'Emily C.',
+      itemsSummary: '1x Pepperoni Pizza, 1x Coke',
+      total: '$18.50',
+      placedAt: 'Out for delivery at 11:45 AM',
+      deliveryLocation: '55 Lakeview Rd',
+    },
+  ];
+};
+
+export const fetchDeliveredOrders = async (): Promise<OrderCardType[]> => {
+  await new Promise(res => setTimeout(res, 120));
+  return [];
 };

@@ -13,28 +13,28 @@ import LocationPickerWithMap from '@/src/components/CustomLocationPicker';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import ImagePickerField from '@/src/components/CustomImagePicker';
 import ComboItemsManager from '@/src/components/menu/ComboItemsManager';
+import FormToggle from '@/src/components/customToggle';
+import { addItemSchema } from '@/src/lib/validations/addMenu.schema';
 
 export default function SetupBusiness() {
     const [loading, setLoading] = useState(false);
 
     const methods = useForm({
-        // resolver: yupResolver(schema),
-        // defaultValues: {
-        //   kitchenName: '',
-        //   kitchenType: '',
-        //   contactNumber: '',
-        //   businessEmail: '',
-        //   location: {
-        //     "address": '',
-        //     "latitude": 22.5726,
-        //     "longitude": 88.3639,
-        //     "raw": { }
-        //   }
-        // },
-    });
+        resolver: yupResolver(addItemSchema),
+        defaultValues: {
+          itemPhoto: undefined,
+          name: '',
+          description: '',
+          itemType: '',
+          price: undefined,
+          isAvailable: false,
+          stockQuantity: 0,
+        },
+      });
 
 
-    const { handleSubmit, control, setValue, getValues, reset } = methods;
+    const { handleSubmit, control, setValue, getValues, reset, watch } = methods;
+    const isAvailable = watch("isAvailable");
 
     const onSubmit = async (data: any) => {
         setLoading(true);
@@ -46,7 +46,7 @@ export default function SetupBusiness() {
         }
         finally {
             setLoading(false);
-            Alert.alert('Saved', 'Form saved successfully — implement navigation to next step.');
+            Alert.alert('Saved', 'Combo added successfully.');
         }
     };
 
@@ -69,12 +69,10 @@ export default function SetupBusiness() {
                     <ScrollView contentContainerStyle={{ paddingVertical: 15, paddingHorizontal: 20 }} keyboardShouldPersistTaps="handled">
 
                         <View className="bg-bg-primary rounded-2xl p-4 border-border-primary border shadow-sm">
-                            <FormTextInput control={control} name="kitchenName" label="Combo Name" placeholder="e.g., Veg Thali"/>
+                            <FormTextInput control={control} name="name" label="Combo Name" placeholder="e.g., Veg Thali"/>
                             <FormTextInput control={control} name="description" label="Description (Optional)" placeholder="Enter a description for your meal" multiline={true} inputHeight={108}/>
                             <FormDropdown control={control} name="itemType" label="Meal Type" placeholder='Select Meal Type' options={['Breakfast', 'Lunch', 'Dinner']} />
                             <FormTextInput control={control} icon='currency-rupee' name="price" label="Price" placeholder="0.00" keyboardType='number-pad' inputMode='numeric' />
-
-                            {/* <CustomButton onPress={handleSubmit(onSubmit)} title='Continue' isLoading={loading} /> */}
                         </View>
 
                         <View className="mt-4 bg-bg-primary rounded-2xl p-4 border-border-primary border shadow-sm">
@@ -82,6 +80,14 @@ export default function SetupBusiness() {
                         </View>
 
                         <ComboItemsManager />
+
+                        <FormToggle control={control} name="isAvailable" helperText="Item is available" />
+                        
+                        {isAvailable ? (
+                        <FormTextInput control={control} name="stockQuantity" label="Stock Quantity" placeholder="0" keyboardType="number-pad" />
+                        ) : null}
+
+                        <CustomButton onPress={handleSubmit(onSubmit)} title='Continue' isLoading={loading} />
 
                         <View style={{ height: 24 }} />
                     </ScrollView>
