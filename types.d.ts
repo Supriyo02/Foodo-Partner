@@ -81,3 +81,28 @@ export type OrderCardType = {
   declined?: boolean;
   rejected?: boolean;
 };
+
+export type PreorderItem = {
+  id: string;
+  name: string;
+  qty: number;
+  image: string;
+};
+
+export type PreorderSection = {
+  id: string;
+  title: string;
+  itemCount: number;
+  items: PreorderItem[];
+  expanded?: boolean;
+};
+
+export type TimeSlot = {
+  id: string;
+  mealType: MealType;
+  start: string;
+  end: string;
+  cutoff: string;
+  isActive: boolean;
+  expanded?: boolean;
+};

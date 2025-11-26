@@ -17,7 +17,7 @@ export default function MenuManagementScreen() {
   return (
     <PaperProvider>
     <SafeAreaView className="flex-1 bg-bg-primary">
-        <View className="px-4 pb-2 pt-8 gap-8 border-b border-gray-200 bg-bg-primary flex-row relative">
+        <View className="px-4 pb-2 pt-4 gap-8 border-b border-gray-200 bg-bg-primary flex-row relative">
           <TouchableOpacity >
             <Image source={images.menu} className='size-6' resizeMode='contain' tintColor='black' />
           </TouchableOpacity>

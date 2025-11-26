@@ -1,4 +1,6 @@
-import { AddCombo, AddItem, Combo, MenuItem, OrderCardType, PreviousMenu } from "@/types";
+import { AddCombo, AddItem, Combo, MenuItem, OrderCardType, PreorderSection, PreviousMenu, TimeSlot } from "@/types";
+import { initialStaticSlots } from "../data/orderData";
+import { uuidv4 } from "./utility";
 
 
 
@@ -169,4 +171,68 @@ export const fetchOutForDeliveryOrders = async (): Promise<OrderCardType[]> => {
 export const fetchDeliveredOrders = async (): Promise<OrderCardType[]> => {
   await new Promise(res => setTimeout(res, 120));
   return [];
+};
+
+const SAMPLE_IMAGE_URI = "https://img.freepik.com/free-psd/roasted-chicken-dinner-platter-delicious-feast_632498-25445.jpg?semt=ais_hybrid&w=740&q=80";
+
+export async function fetchPreordersForDate(dateISO: string): Promise<PreorderSection[]> {
+  await new Promise((r) => setTimeout(r, 80));
+  return [
+    {
+      id: "tiffin",
+      title: "Tiffin",
+      itemCount: 2,
+      expanded: false,
+      items: [
+        { id: "t1", name: "Veg Sandwitch", qty: 3, image: SAMPLE_IMAGE_URI },
+        { id: "t2", name: "Chowmin", qty: 5, image: SAMPLE_IMAGE_URI },
+      ],
+    },
+    {
+      id: "lunch",
+      title: "Lunch",
+      itemCount: 3,
+      expanded: true,
+      items: [
+        { id: "l1", name: "Rice", qty: 15, image: SAMPLE_IMAGE_URI },
+        { id: "l2", name: "Dal", qty: 12, image: SAMPLE_IMAGE_URI },
+        { id: "l3", name: "Posto", qty: 12, image: SAMPLE_IMAGE_URI },
+      ],
+    },
+    {
+      id: "dinner",
+      title: "Dinner",
+      itemCount: 3,
+      expanded: false,
+      items: [
+        { id: "l1", name: "Rice", qty: 15, image: SAMPLE_IMAGE_URI },
+        { id: "l2", name: "Dal", qty: 12, image: SAMPLE_IMAGE_URI },
+        { id: "l3", name: "Posto", qty: 12, image: SAMPLE_IMAGE_URI },
+      ],
+    },
+  ];
+}
+
+export const fetchTimeSlots = async (): Promise<TimeSlot[]> => {
+  await new Promise((r) => setTimeout(r, 80));
+  return JSON.parse(JSON.stringify(initialStaticSlots));
+};
+
+export const addTimeSlot = async (payload: Omit<TimeSlot, "id">): Promise<TimeSlot> => {
+  await new Promise((r) => setTimeout(r, 80));
+  return { ...payload, id: uuidv4() };
+};
+
+export const updateTimeSlot = async (id: string, patch: Partial<TimeSlot>): Promise<TimeSlot> => {
+  await new Promise((r) => setTimeout(r, 80));
+  // merge with id last to avoid duplicate-id TypeScript warning
+  const merged: TimeSlot = {
+    ...(patch as Partial<TimeSlot>),
+    id,
+  } as TimeSlot;
+  return merged;
+};
+
+export const deleteTimeSlot = async (id: string) => {
+  await new Promise((r) => setTimeout(r, 80));
 };
