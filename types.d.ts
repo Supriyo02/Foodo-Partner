@@ -121,3 +121,13 @@ export type DistanceFormValues = {
 export type LocationFormValues = {
   location: RawLocation | null;
 };
+
+export type NotificationItem = {
+  id: string;
+  title: string;
+  body: string;
+  timeLabel: string;
+  unread: boolean;
+  icon?: "order" | "payment" | "update" | "delivered";
+  iconBg?: string;
+};

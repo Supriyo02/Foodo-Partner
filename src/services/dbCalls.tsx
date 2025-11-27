@@ -1,6 +1,7 @@
-import { AddCombo, AddItem, Combo, MenuItem, OrderCardType, PreorderSection, PreviousMenu, RawLocation, TimeSlot } from "@/types";
+import { AddCombo, AddItem, Combo, MenuItem, NotificationItem, OrderCardType, PreorderSection, PreviousMenu, RawLocation, TimeSlot } from "@/types";
 import { initialStaticSlots } from "../data/orderData";
 import { uuidv4 } from "./utility";
+import { notificationsData } from "../data/inboxData";
 
 
 
@@ -272,3 +273,15 @@ export const submitDeliverySettings = async (payload: {
     console.log("submitDeliverySettings payload:", payload);
     setTimeout(() => res({ ok: true }), 400);
   });
+
+export async function fetchNotifications(): Promise<NotificationItem[]> {
+  await new Promise((r) => setTimeout(r, 120));
+  // return a copy so callers can mutate safely
+  return notificationsData.map((i) => ({ ...i }));
+}
+
+export async function markNotificationAsRead(id: string): Promise<{ ok: boolean }> {
+  await new Promise((r) => setTimeout(r, 160));
+  // In real implementation, call server to mark as read
+  return { ok: true };
+}

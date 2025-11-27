@@ -12,7 +12,7 @@ export default function Index() {
         <View className="w-full px-6 mb-10">
 
           <TouchableOpacity
-            onPress={() => router.push('/profilesettings/delivery-time-location')}
+            onPress={() => router.push('/inbox/inbox-tabs')}
             activeOpacity={0.8}
             className="bg-primary py-4 rounded-xl mb-3"
           >
