@@ -92,39 +92,11 @@ export default function SetupBusiness() {
               <FormTextInput control={control} name="contactNumber" label="Contact Number" placeholder="Enter your contact number" keyboardType="phone-pad" icon="phone" maxLength={10} />
               <FormTextInput control={control} name="businessEmail" label="Business Email" placeholder="you@example.com" keyboardType="email-address" icon="email" />
 
-              {/* <Text className="text-lg text-text-secondary font-inter-bold mb-3 mt-4">Kitchen Location</Text>
-              <FormTextInput control={control} name="address" label="Full Kitchen Address" placeholder="123 Foodie Lane, Flavor Town" multiline />
+              <LocationPickerWithMap label='Kitchen Address' control={control} name="location" apiKey='4560770ebd274d458a62b41073058658' />
 
-              <View className="h-40 my-4 rounded-lg overflow-hidden bg-gray-100 items-center justify-center">
-                <Text className="text-gray-400">[Map preview placeholder — integrate react-native-maps in real app]</Text>
-              </View> */}
-
-              {/* <CustomLocationPicker control={control} /> */}
-
-              <LocationPickerWithMap control={control} name="location" apiKey='4560770ebd274d458a62b41073058658' />
-
-              {/* <TouchableOpacity onPress={handleSubmit(onSubmit)} className="bg-primary rounded-xl p-4 w-full flex flex-row justify-center">
-                <Text className='text-white font-inter-bold paragraph-semibold'>Save and Continue</Text>
-              </TouchableOpacity> */}
               <CustomButton onPress={handleSubmit(onSubmit)} title='Continue' isLoading={loading} />
             </View>
 
-            {/* <View className="mt-6 bg-white rounded-2xl p-4 shadow-sm">
-              <Text className="text-2xl font-extrabold mb-2">Business & ID Details</Text>
-              <Text className="text-gray-400 mb-4">Please provide your official business and identification documents.</Text>
-
-              <FormTextInput control={control} name="panNumber" label="PAN Card Number" placeholder="Enter your PAN card number" />
-              <FormTextInput control={control} name="gstNumber" label="GST Number (Optional)" placeholder="Enter your GST number" />
-
-              <ImagePickerField control={control} name="idProof" label="Upload ID Proof" height={140} />
-
-              <View className="mt-4">
-                <Button mode="contained" onPress={handleSubmit(onSubmit)} className="rounded-full">Next: Bank Details</Button>
-                <TouchableOpacity onPress={() => Alert.alert('Saved', 'Progress saved locally — implement persistence as needed')} className="mt-3 items-center">
-                  <Text className="text-red-600 font-semibold">Save and Exit</Text>
-                </TouchableOpacity>
-              </View>
-            </View> */}
 
             <View style={{ height: 24 }} />
           </ScrollView>

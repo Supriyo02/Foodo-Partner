@@ -20,3 +20,18 @@ export const slotSchema = yup.object({
       return val < startDate;
     }),
 });
+
+export const distanceSchema = yup.object({
+  distance: yup.number().required().min(0).max(20),
+});
+
+export const locationSchema = yup.object({
+  location: yup
+    .object({
+      address: yup.string().required(),
+      latitude: yup.number().required(),
+      longitude: yup.number().required(),
+      raw: yup.mixed(),
+    })
+    .nullable(),
+});

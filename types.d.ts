@@ -106,3 +106,18 @@ export type TimeSlot = {
   isActive: boolean;
   expanded?: boolean;
 };
+
+export type RawLocation = {
+  address: string;
+  latitude: number;
+  longitude: number;
+  raw?: Record<string, any>;
+};
+
+export type DistanceFormValues = {
+  distance: number;
+};
+
+export type LocationFormValues = {
+  location: RawLocation | null;
+};

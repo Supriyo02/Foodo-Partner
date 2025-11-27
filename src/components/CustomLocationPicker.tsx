@@ -15,6 +15,8 @@ type LocationValue = {
 type Props = {
   control: Control<any>;
   name?: string;
+  label?: string,
+  subLabel?: string,
   apiKey?: string; 
   placeholder?: string;
   mapHeight?: number;
@@ -33,6 +35,8 @@ function useDebounce<T>(value: T, delay = 400) {
 export default function LocationPickerWithMap({
   control,
   name = 'location',
+  label,
+  subLabel,
   apiKey,
   placeholder = 'Search address or landmark',
   mapHeight = 260,
@@ -254,7 +258,8 @@ export default function LocationPickerWithMap({
   return (
     <View className="w-full">
       <View className="mb-2">
-        <Text className="text-md font-inter-semibold mb-1">Kitchen address</Text>
+        {label && <Text className="text-md font-inter-semibold">{label}</Text>}
+        {subLabel && <Text className="text-sm text-gray-500 mb-2">{subLabel}</Text>}
         <View className="relative">
           <TextInput
             value={query}

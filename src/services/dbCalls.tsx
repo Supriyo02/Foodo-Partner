@@ -1,4 +1,4 @@
-import { AddCombo, AddItem, Combo, MenuItem, OrderCardType, PreorderSection, PreviousMenu, TimeSlot } from "@/types";
+import { AddCombo, AddItem, Combo, MenuItem, OrderCardType, PreorderSection, PreviousMenu, RawLocation, TimeSlot } from "@/types";
 import { initialStaticSlots } from "../data/orderData";
 import { uuidv4 } from "./utility";
 
@@ -236,3 +236,39 @@ export const updateTimeSlot = async (id: string, patch: Partial<TimeSlot>): Prom
 export const deleteTimeSlot = async (id: string) => {
   await new Promise((r) => setTimeout(r, 80));
 };
+
+
+export const fetchDeliverySettings = async (): Promise<{ distance: number; areas: RawLocation[] }> =>
+  new Promise((res) =>
+    setTimeout(
+      () =>
+        res({
+          distance: 5,
+          areas: [
+            { address: "Koramangala, 560034", latitude: 12.9352, longitude: 77.6245, raw: {} },
+            { address: "HSR Layout, 560102", latitude: 12.9106, longitude: 77.6411, raw: {} },
+            { address: "Indiranagar, 560038", latitude: 12.9718, longitude: 77.6413, raw: {} },
+          ],
+        }),
+      300
+    )
+  );
+
+export const addDefinedArea = async (loc: RawLocation): Promise<RawLocation> =>
+  new Promise((res) => setTimeout(() => res(loc), 250));
+
+export const removeDefinedArea = async (address: string): Promise<{ removed: boolean }> =>
+  new Promise((res) => setTimeout(() => res({ removed: true }), 200));
+
+export const updateMaxDistance = async (distance: number): Promise<{ ok: boolean }> =>
+  new Promise((res) => setTimeout(() => res({ ok: true }), 200));
+
+export const submitDeliverySettings = async (payload: {
+  distance: number;
+  definedAreas: RawLocation[];
+}): Promise<{ ok: boolean }> =>
+  new Promise((res) => {
+    // simulate server logging
+    console.log("submitDeliverySettings payload:", payload);
+    setTimeout(() => res({ ok: true }), 400);
+  });
