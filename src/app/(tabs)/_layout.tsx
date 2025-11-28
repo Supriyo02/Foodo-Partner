@@ -72,6 +72,13 @@ export default function TabLayout() {
             }}
             />
             <Tabs.Screen
+            name='inbox'
+            options={{
+                title: 'Inbox',
+                tabBarIcon: ({focused}) => <TabBarIcon title='Inbox' icon={images.inbox} focused={focused} />
+            }}
+            />
+            <Tabs.Screen
             name='profile'
             options={{
                 title: 'Profile',

@@ -11,7 +11,7 @@ import Reviews from '@/src/components/inbox/Reviews'
 
 const Tab = createMaterialTopTabNavigator();
 
-const InboxTabs = () => {
+const Inbox = () => {
     return (
         <SafeAreaView className="flex-1 bg-bg-primary">
             <View className="px-4 py-1 border-b border-gray-200 bg-bg-primary flex-row relative">
@@ -25,7 +25,7 @@ const InboxTabs = () => {
 
             <View className="flex-1">
                 <Tab.Navigator
-                    initialRouteName="MessagesTab"
+                    initialRouteName="NotificationsTab"
                     tabBar={(props) => <CustomTopTabBar {...props} />}
                     screenOptions={{
                         swipeEnabled: true,
@@ -65,4 +65,4 @@ const InboxTabs = () => {
     )
 }
 
-export default InboxTabs
+export default Inbox

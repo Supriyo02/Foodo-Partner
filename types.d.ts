@@ -131,3 +131,8 @@ export type NotificationItem = {
   icon?: "order" | "payment" | "update" | "delivered";
   iconBg?: string;
 };
+
+export type FaqContactDetails = {
+  email: string;
+  phone: string;
+};

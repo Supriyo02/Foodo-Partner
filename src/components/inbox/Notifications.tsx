@@ -1,18 +1,6 @@
 // src/components/inbox/Notifications.tsx
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  TextInput,
-  TouchableOpacity,
-  Pressable,
-  LayoutAnimation,
-  Platform,
-  UIManager,
-  ActivityIndicator,
-  Animated,
-} from "react-native";
+import { View, Text, FlatList, TextInput, TouchableOpacity, Pressable, LayoutAnimation, Platform, UIManager, ActivityIndicator, Animated } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { NotificationItem } from "@/types";
 import { fetchNotifications, markNotificationAsRead } from "@/src/services/dbCalls";
@@ -35,7 +23,6 @@ const Notifications: React.FC = () => {
   const searchTimeout = useRef<number | null>(null);
   const [filtered, setFiltered] = useState<NotificationItem[]>([]);
 
-  // fetch on mount
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -52,7 +39,6 @@ const Notifications: React.FC = () => {
     };
   }, []);
 
-  // debounced search
   useEffect(() => {
     if (searchTimeout.current) clearTimeout(searchTimeout.current);
     searchTimeout.current = (setTimeout(() => {
@@ -70,17 +56,14 @@ const Notifications: React.FC = () => {
         );
       }
     }, 180) as unknown) as number;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, items]);
 
   const onPressNotification = useCallback(
     async (id: string) => {
-      // optimistic update locally for snappy UI
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
       setItems((prev) => prev.map((p) => (p.id === id ? { ...p, unread: false } : p)));
       setFiltered((prev) => prev.map((p) => (p.id === id ? { ...p, unread: false } : p)));
 
-      // call service (simulated)
       try {
         await markNotificationAsRead(id);
       } catch (err) {
@@ -103,9 +86,8 @@ const Notifications: React.FC = () => {
 
   return (
     <View className="flex-1 bg-bg-primary">
-      {/* Search input inside the tab */}
       <View className="px-4 pt-1 pb-2 bg-bg-primary">
-        <View className="flex-row items-center bg-white rounded-lg px-3 py-2 shadow-sm">
+        <View className="flex-row items-center bg-white rounded-3xl px-3 py-2 shadow-sm">
           <MaterialIcons name="search" size={20} color="#9ca3af" />
           <TextInput
             value={query}
@@ -124,8 +106,8 @@ const Notifications: React.FC = () => {
         </View>
       </View>
 
-      <View className="px-2">
-        <Text className="text-sm text-gray-500 px-2 pb-2">
+      <View className="px-4">
+        <Text className="text-sm font-inter text-gray-600 px-2 pb-2">
           {unreadCount > 0 ? `${unreadCount} unread` : "No unread notifications"}
         </Text>
       </View>
@@ -152,14 +134,10 @@ const Notifications: React.FC = () => {
 
 export default Notifications;
 
-/* ---------------------------
-   NotificationRow component
-   --------------------------- */
 const DOT_SIZE = 8;
 
 const NotificationRow: React.FC<{ item: NotificationItem; onPress: () => void }> = React.memo(
   ({ item, onPress }) => {
-    // animate unread dot fade
     const dotOpacity = useRef(new Animated.Value(item.unread ? 1 : 0)).current;
 
     useEffect(() => {
@@ -176,7 +154,7 @@ const NotificationRow: React.FC<{ item: NotificationItem; onPress: () => void }>
         order: "inventory-2",
         payment: "paid",
         update: "campaign",
-        delivered: "check-circle",
+        delivered: "check-circle-outline",
     } satisfies Record<string, keyof typeof MaterialIcons.glyphMap>;
     const iconName = ICON_MAP[item.icon ?? "order"];
 
@@ -188,33 +166,30 @@ const NotificationRow: React.FC<{ item: NotificationItem; onPress: () => void }>
         accessibilityRole="button"
         style={{ paddingVertical: 12 }}
       >
-        <View className="flex-row items-start px-4">
-          {/* Icon circle */}
+        <View className="flex-row items-start px-6">
           <View
-            className="w-11 h-11 rounded-full items-center justify-center"
+            className="w-12 h-12 rounded-full items-center justify-center"
             style={{ backgroundColor: bgColor }}
           >
-            <MaterialIcons name={iconName} size={20} color="#ef4444" />
+            <MaterialIcons name={iconName} size={22} color={(iconName=='paid'||iconName=='check-circle-outline') ? '#00ad14' : '#ea0b2c'} />
           </View>
 
-          {/* text */}
           <View className="flex-1 ml-3 pr-2">
             <View className="flex-row justify-between items-start">
-              <Text className="text-base font-bold text-text-primary" numberOfLines={1}>
+              <Text className="text-lg font-inter-semibold text-text-primary" numberOfLines={1}>
                 {item.title}
               </Text>
 
               <View className="items-end">
-                <Text className="text-xs text-gray-400">{item.timeLabel}</Text>
+                <Text className="text-sm font-inter-light  text-text-secondary">{item.timeLabel}</Text>
               </View>
             </View>
 
-            <Text className="text-sm text-gray-500 mt-1" numberOfLines={2}>
+            <Text className="text-md font-inter text-gray-500 mt-1" numberOfLines={2}>
               {item.body}
             </Text>
           </View>
 
-          {/* unread dot */}
           <Animated.View
             style={{
               opacity: dotOpacity,

@@ -1,4 +1,4 @@
-import { AddCombo, AddItem, Combo, MenuItem, NotificationItem, OrderCardType, PreorderSection, PreviousMenu, RawLocation, TimeSlot } from "@/types";
+import { AddCombo, AddItem, Combo, FaqContactDetails, MenuItem, NotificationItem, OrderCardType, PreorderSection, PreviousMenu, RawLocation, TimeSlot } from "@/types";
 import { initialStaticSlots } from "../data/orderData";
 import { uuidv4 } from "./utility";
 import { notificationsData } from "../data/inboxData";
@@ -284,4 +284,50 @@ export async function markNotificationAsRead(id: string): Promise<{ ok: boolean 
   await new Promise((r) => setTimeout(r, 160));
   // In real implementation, call server to mark as read
   return { ok: true };
+}
+
+const DEFAULT_AVATAR = 'https://hips.hearstapps.com/hmg-prod/images/edc100124gambrel-006-66e0bc34ac150.jpg?crop=0.688xw:1.00xh;0.276xw,0&resize=1200:*';
+
+export async function fetchProfile() {
+  // simulated async fetch
+  return Promise.resolve({
+    businessName: 'The Cozy Kitchen',
+    tagline: 'Italian • Home style',
+    address: '123 Gourmet Lane, Foodville',
+    email: 'hello@cozykitchen.com',
+    avatar: DEFAULT_AVATAR,
+  });
+}
+
+
+export async function fetchSettings() {
+  return Promise.resolve({
+    notificationsEnabled: true,
+    language: 'English',
+  });
+}
+
+export async function saveSettings(payload: {notificationsEnabled?: boolean; language?: string}) {
+  // persist later; for now just resolve
+  console.log('saveSettings called', payload);
+  return Promise.resolve({ok: true});
+}
+
+export async function logoutUser() {
+  // TODO: call backend logout or clear tokens
+  return Promise.resolve({ok: true});
+}
+
+export async function fetchContactDetails(): Promise<FaqContactDetails> {
+  // replace with your real DB/network call later
+  return Promise.resolve({
+    email: 'support@foodo.com',
+    phone: '+91 9725640000',
+  });
+}
+
+export const faqFormSubmit = async (data: object) => {
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    console.log("Form Data: ", data)
+    return 200;
 }
