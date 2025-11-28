@@ -9,12 +9,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import cn from 'clsx'
 import useDbCall from "@/src/services/useDbCall";
 import { sendOtp } from "@/src/services/dbCalls";
+import { useAuthStore } from "@/src/stores/authStore";
 
 
 const AnimatedView = Animated.createAnimatedComponent(View);
 
 export default function LogIn() {
-  const isAuthenticated = false;
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   if(isAuthenticated) return <Redirect href='/dashboard' />
 
   const router = useRouter();

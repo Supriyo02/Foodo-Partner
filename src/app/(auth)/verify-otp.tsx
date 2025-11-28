@@ -6,6 +6,7 @@ import Animated, { useSharedValue, useAnimatedStyle, withTiming } from "react-na
 import {useLocalSearchParams, useRouter } from "expo-router";
 import { sendOtp, verifyOtp } from "@/src/services/dbCalls";
 import TopAlert, { TopAlertHandle } from "@/src/components/TopAlert";
+import { useAuthStore } from "@/src/stores/authStore";
 
 export default function VerifyOtp() {
   const [otp, setOtp] = useState(["", "", "", ""]);
@@ -14,6 +15,7 @@ export default function VerifyOtp() {
   const { phone } = useLocalSearchParams<{ phone: string }>();
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const login = useAuthStore(state => state.login);
 
   useEffect(() => {
   const timer = setTimeout(() => {
@@ -61,6 +63,7 @@ export default function VerifyOtp() {
     setLoading(true);
     try {
       await verifyOtp(phone);
+      login();
       router.push('/setup-kitchen-details')
     } catch (error) {
       const errorMessage =

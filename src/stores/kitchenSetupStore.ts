@@ -1,4 +1,3 @@
-// store/registrationStore.ts
 import { create } from 'zustand';
 
 export type Location = {

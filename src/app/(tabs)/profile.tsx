@@ -12,6 +12,7 @@ import { router } from 'expo-router';
 import { images } from "@/src/lib/constants";
 import { StyleSheet } from "react-native";
 import CustomButton from '@/src/components/CustomButton';
+import { useAuthStore } from '@/src/stores/authStore';
 
 const SectionHeader: React.FC<{title: string}> = memo(({title}) => (
   <Text className="text-sm text-gray-400 font-inter-semibold px-4 mt-6 mb-2">{title.toUpperCase()}</Text>
@@ -46,6 +47,7 @@ export default function Profile() {
   const [profile, setProfile] = useState<any>(null);
   const [settings, setSettings] = useState<{notificationsEnabled: boolean; language: string} | null>(null);
   const [saving, setSaving] = useState(false);
+  const logout = useAuthStore(state => state.logout);
 
   useEffect(() => {
     let mounted = true;
@@ -78,6 +80,7 @@ export default function Profile() {
         style: 'destructive',
         onPress: async () => {
           await logoutUser();
+          logout();
           // navigate to login or reset stack
           router.push('/')
         },
@@ -100,7 +103,7 @@ export default function Profile() {
       </ImageBackground>
 
       <SafeAreaView className="flex-1 bg-slate-100">
-      <View className="-mt-12 px-4">
+      <View className="-mt-8 px-4">
         <View className="bg-white rounded-b-2xl p-5 shadow-md">
           <View className="items-center">
             <View className="w-32 h-32 rounded-full overflow-hidden border-2 border-white -mt-20 shadow-sm bg-gray-100 items-center justify-center">

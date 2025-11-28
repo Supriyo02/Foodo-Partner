@@ -226,7 +226,7 @@ export default function ContactSupportScreen() {
 
                   <TouchableOpacity
                     onPress={() => openPhone(contact.phone)}
-                    className="bg-white rounded-xl px-4 py-3 shadow-sm flex-row items-center gap-2"
+                    className="bg-gray-100 rounded-xl px-4 py-3 shadow-sm flex-row items-center gap-2"
                   >
                     <View className="w-11 h-11 rounded-full items-center justify-center bg-[#ffcccf] mr-3">
                         <Feather name="phone" size={18} color="#ef4444" />
